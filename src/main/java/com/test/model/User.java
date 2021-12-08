@@ -11,6 +11,7 @@ import java.util.Objects;
 @Entity
 public class User {
 //comment
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
