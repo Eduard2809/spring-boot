@@ -50,6 +50,8 @@ public class User {
     @Column(unique = true)
     private String resetPasswordToken;
 
+    private long resetPasswordTokenCreationDate;
+
     public User(){}
 
     public User(String name, String email, String password, Gender gender, Address address, Phone phone) {
@@ -71,6 +73,14 @@ public class User {
 
     public int getId() {
         return id;
+    }
+
+    public long getResetPasswordTokenCreationDate() {
+        return resetPasswordTokenCreationDate;
+    }
+
+    public void setResetPasswordTokenCreationDate(long resetPasswordTokenCreationDate) {
+        this.resetPasswordTokenCreationDate = resetPasswordTokenCreationDate;
     }
 
     public void setId(int id) {

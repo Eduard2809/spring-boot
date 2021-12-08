@@ -7,6 +7,7 @@ import com.test.model.Status;
 import com.test.model.User;
 import com.test.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -30,6 +32,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @Async
     public void save(User user) throws NotFoundException {
         user.setStatus(Status.UNVERIFIED);
         Address address = null;
@@ -56,7 +59,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new NotFoundException("USER NOT FOUND");
         } else if (user.getStatus().equals(Status.UNVERIFIED)) {
-            throw new BadRequestException("email is not verified");
+            throw new BadRequestException();
         }
     }
 
@@ -96,6 +99,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Async
     public void forgetPassword(String email) throws NotFoundException, MessagingException {
         User user = userRepository.getByEmail(email);
         if (user == null){
@@ -104,23 +108,29 @@ public class UserServiceImpl implements UserService {
         String code = new GenerateString().generateString();
         mailSender.sendCode(email,"CODE",code);
         user.setResetPasswordToken(code);
+        long milliseconds = System.currentTimeMillis();
+        user.setResetPasswordTokenCreationDate(milliseconds);
         userRepository.save(user);
     }
 
     @Override
-    public void resetPassword(String email, String code, String password1, String password2) throws NotFoundException {
+    public void resetPassword(String email, String code, String password1, String password2) throws NotFoundException, BadRequestException {
         User user = userRepository.getByEmail(email);
         if (user == null){
             throw new NotFoundException("Not found");
         }
         if (userRepository.getByResetPasswordToken(code) != null && password1.equals(password2)){
-            String encodedPassword = passwordEncoder.encode(user.getPassword());
-            user.setPassword(encodedPassword);
-            userRepository.save(user);
+            if (System.currentTimeMillis() - user.getResetPasswordTokenCreationDate() < 60*1000) {
+
+                String encodedPassword = passwordEncoder.encode(user.getPassword());
+                user.setPassword(encodedPassword);
+                userRepository.save(user);
+            }else throw new BadRequestException();
         }
     }
 
     @Override
+    @Async
     public void sandEmail(String toEmail) throws NotFoundException, MessagingException {
         User user = userRepository.getByEmail(toEmail);
         if (user == null){

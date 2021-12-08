@@ -81,7 +81,7 @@ public class UserController {
 
     @PostMapping
     @RequestMapping("/reset-password")
-    public void resetPassword(@RequestParam String email, String code, String pass1, String pass2) throws NotFoundException {
+    public void resetPassword(@RequestParam String email, String code, String pass1, String pass2) throws NotFoundException, BadRequestException {
         userService.resetPassword(email, code, pass1, pass2);
     }
 

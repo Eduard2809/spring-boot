@@ -32,5 +32,5 @@ public interface UserService {
 
     void forgetPassword(String email) throws NotFoundException, MessagingException;
 
-    void resetPassword(String email, String code, String password1, String password2) throws NotFoundException;
+    void resetPassword(String email, String code, String password1, String password2) throws NotFoundException, BadRequestException;
 }
