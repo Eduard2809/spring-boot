@@ -112,8 +112,7 @@ public class UserServiceImpl implements UserService {
         user.setResetPasswordTokenCreationDate(milliseconds);
         userRepository.save(user);
     }
-
-
+    
     @Override
     public void resetPassword(String email, String code, String password1, String password2) throws NotFoundException, BadRequestException {
         User user = userRepository.getByEmail(email);
