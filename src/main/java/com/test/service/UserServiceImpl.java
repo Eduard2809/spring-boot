@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
@@ -31,9 +32,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    @Transactional
-    @Async
-    public void save(User user) throws NotFoundException {
+    public void save(User user) throws NotFoundException, MessagingException {
         user.setStatus(Status.UNVERIFIED);
         Address address = null;
         try {
@@ -48,6 +47,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(encodedPassword);
         addressService.save(user.getAddress());
         userRepository.save(user);
+        sandEmail(user.getEmail());
     }
 
     @Override
@@ -84,8 +84,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAll() {
-        return userRepository.findAll();
+    public List<User> getAll(String email) throws BadRequestException {
+        User user = userRepository.getByEmail(email);
+        if (user != null &&
+                System.currentTimeMillis() - user.getBirthDay().getTime() > 18000L * 31556952) {
+            return userRepository.findAll();
+        }
+        else throw new BadRequestException();
+    }
+
+    @Override
+    public List<User> getAllByAge() {
+        return userRepository.getAllByAge();
     }
 
     @Override
@@ -114,6 +124,7 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
+    @Async
     public void resetPassword(String email, String code, String password1, String password2) throws NotFoundException, BadRequestException {
         User user = userRepository.getByEmail(email);
         if (user == null){
@@ -131,6 +142,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Async
+//    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void sandEmail(String toEmail) throws NotFoundException, MessagingException {
         User user = userRepository.getByEmail(toEmail);
         if (user == null){

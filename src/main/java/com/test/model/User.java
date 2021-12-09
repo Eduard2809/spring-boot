@@ -2,8 +2,11 @@ package com.test.model;
 
 
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,6 +55,9 @@ public class User {
 
     private long resetPasswordTokenCreationDate;
 
+    @DateTimeFormat(pattern="dd/MM/yyyy")
+    private Date birthDay;
+
     public User(){}
 
     public User(String name, String email, String password, Gender gender, Address address, Phone phone) {
@@ -61,6 +67,14 @@ public class User {
         this.gender = gender;
         this.address = address;
         this.phone = phone;
+    }
+
+    public Date getBirthDay() {
+        return birthDay;
+    }
+
+    public void setBirthDay(Date birthDay) {
+        this.birthDay = birthDay;
     }
 
     public List<Authorities> getAuthorities() {

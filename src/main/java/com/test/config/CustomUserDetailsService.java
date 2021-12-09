@@ -27,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     private UserService userService;
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user;
         try {
@@ -40,7 +40,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         for (Authorities authority : user.getAuthorities()) {
                 GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(authority.getName());
                 grantedAuthorities.add(grantedAuthority);
-
         }
         if (user.getStatus().equals(Status.UNVERIFIED)){
             return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),

@@ -10,9 +10,9 @@ import java.util.Optional;
 
 public interface UserService {
 
-    List<User> getAll();
+    List<User> getAll(String email) throws BadRequestException;
 
-    void save(User user) throws NotFoundException;
+    void save(User user) throws NotFoundException, MessagingException;
 
     void deleteById(int id);
 
@@ -23,6 +23,8 @@ public interface UserService {
     User getByEmail(String email) throws NotFoundException;
 
     List<User> getAllByName(String name);
+
+    List<User> getAllByAge();
 
     void verified(String email) throws NotFoundException;
 

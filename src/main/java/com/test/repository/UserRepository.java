@@ -26,4 +26,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     User getByResetPasswordToken(String resetPasswordToken);
 
+    @Query(value = "SELECT u FROM User u where YEAR(CURDATE()) - YEAR(u.birthDay) > 18")
+    List<User> getAllByAge();
 }

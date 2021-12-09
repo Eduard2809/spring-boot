@@ -19,10 +19,17 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @RolesAllowed(value = "ROLE_ADMIN")
+//    @RolesAllowed(value = "ROLE_ADMIN")
+    @RequestMapping("/get")
     @GetMapping
-    public List<User> getAll(){
-        return userService.getAll();
+    public List<User> getAll(String email) throws BadRequestException {
+        return userService.getAll(email);
+    }
+
+    @GetMapping
+    @RequestMapping("/age")
+    public List<User> getAllByAge(){
+        return userService.getAllByAge();
     }
 
     @GetMapping("{id}")
@@ -52,7 +59,7 @@ public class UserController {
     @RequestMapping("/save")
     public String save(@RequestBody User user) throws NotFoundException, MessagingException {
         userService.save(user);
-        userService.sandEmail(user.getEmail());
+//        userService.sandEmail(user.getEmail());
         return "If you want to verify your mail please check your massages";
     }
     @PostMapping

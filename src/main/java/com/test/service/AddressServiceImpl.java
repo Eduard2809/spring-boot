@@ -21,7 +21,7 @@ public class AddressServiceImpl implements AddressService {
         return addressRepository.findAll();
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     @Override
     public void save(Address address) throws NotFoundException {
         addressRepository.save(address);
